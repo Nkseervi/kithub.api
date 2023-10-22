@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kithub.api", "kithub.api\kithub.api.csproj", "{03EAE7E4-F7FD-4545-99D4-F82E6B03FCED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kithub.api.models", "..\kithub.api.models\kithub.api.models.csproj", "{E2F0DAA0-D023-48F6-A7CA-E30F57A70082}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "kithub.api.models", "kithub.api.models\kithub.api.models.csproj", "{E2F0DAA0-D023-48F6-A7CA-E30F57A70082}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
