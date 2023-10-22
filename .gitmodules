@@ -1,0 +1,3 @@
+[submodule "kithub.api.models"]
+	path = kithub.api.models
+	url = https://github.com/Nkseervi/kithub.api.models.git
