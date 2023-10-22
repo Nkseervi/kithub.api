@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\kithub.api.models\kithub.api.models.csproj" />
+    <ProjectReference Include="..\kithub.api.models\kithub.api.models.csproj" />
   </ItemGroup>
 
 </Project>
