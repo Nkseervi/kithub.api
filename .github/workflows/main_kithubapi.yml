@@ -22,7 +22,6 @@ jobs:
         with:
           repository: Nkseervi/kithub.api.models
           token: ${{ secrets.API_PAT }}
-          path: kithub.api.models
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
