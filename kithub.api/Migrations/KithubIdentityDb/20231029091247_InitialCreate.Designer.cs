@@ -12,7 +12,7 @@ using kithub.api.Areas.Identity.Data;
 namespace kithub.api.Migrations.KithubIdentityDb
 {
     [DbContext(typeof(KithubIdentityDbContext))]
-    [Migration("20231029084354_InitialCreate")]
+    [Migration("20231029091247_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
