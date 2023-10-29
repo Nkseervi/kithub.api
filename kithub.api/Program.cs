@@ -22,7 +22,9 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("KithubAPIContext
 builder.Services.AddDbContextPool<KithubIdentityDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("KithubAPIContext") ?? throw new InvalidOperationException("Connection string 'KesarjotAPIContext' not found.")));
 
-builder.Services.AddDefaultIdentity<KithubUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<KithubIdentityDbContext>();
+builder.Services.AddDefaultIdentity<KithubUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<KithubIdentityDbContext>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();

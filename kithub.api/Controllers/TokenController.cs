@@ -13,10 +13,10 @@ namespace kithub.api.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<KithubUser> _userManager;
         private readonly IConfiguration _config;
 
-        public TokenController(UserManager<IdentityUser> userManager, IConfiguration config)
+        public TokenController(UserManager<KithubUser> userManager, IConfiguration config)
         {
             _userManager = userManager;
             _config = config;
