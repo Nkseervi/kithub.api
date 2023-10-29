@@ -1,7 +1,10 @@
-﻿namespace kithub.api.Controllers
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace kithub.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository productRepository;
