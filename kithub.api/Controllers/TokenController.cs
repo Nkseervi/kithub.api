@@ -23,7 +23,7 @@ namespace kithub.api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string username, string password, string grant_type)
+        public async Task<IActionResult> Create([FromForm] string username, [FromForm] string password, [FromForm] string grant_type)
         {
             if (await IsValidUsernameAndPassword(username, password))
             {
