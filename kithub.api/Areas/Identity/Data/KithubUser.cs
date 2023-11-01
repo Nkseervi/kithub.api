@@ -9,5 +9,9 @@ namespace kithub.api.Areas.Identity.Data;
 // Add profile data for application users by adding properties to the KithubUser class
 public class KithubUser : IdentityUser
 {
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string EmailAddress { get; set; }
+    public DateTime CreateDate { get; set; }
 }
 

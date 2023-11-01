@@ -1,4 +1,6 @@
-﻿namespace kithub.api.Extensions
+﻿using kithub.api.Areas.Identity.Data;
+
+namespace kithub.api.Extensions
 {
     public static class DtoConversions
     {
@@ -80,6 +82,21 @@
                 Qty = cartItem.Qty,
                 TotalPrice = product.Price * cartItem.Qty
             };
+        }
+
+        public static IEnumerable<UserDto> ConvertToDto(this IEnumerable<KithubUser> users, IEnumerable<string> roles)
+        {
+            return (from user in users
+                    select new UserDto
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        CreateDate = user.CreateDate,
+                        EmailAddress = user.EmailAddress,
+                        Roles = roles
+                    }).ToList();
+
         }
     }
 }

@@ -28,6 +28,7 @@ builder.Services.AddDefaultIdentity<KithubUser>(options => options.SignIn.Requir
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddAuthentication(options =>
 {
