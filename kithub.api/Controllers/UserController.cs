@@ -1,4 +1,5 @@
-﻿using kithub.api.Extensions;
+﻿using kithub.api.Areas.Identity.Data;
+using kithub.api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,43 @@ namespace kithub.api.Controllers
         public UserController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
+        }
+
+        public record UserRegistrationDto(
+            string FirstName,
+            string LastName,
+            string EmailAddress,
+            string Password);
+
+        [HttpPost]
+        [Route("/Register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(UserRegistrationDto userDto)
+        {
+            if(ModelState.IsValid)
+            {
+                var existingUser = await _userRepository.FindExistingUser(userDto.EmailAddress);
+                if (existingUser is null)
+                {
+                    KithubUser newUser = new()
+                    {
+                        Email = userDto.EmailAddress,
+                        EmailConfirmed = true,
+                        UserName = userDto.EmailAddress,
+                        FirstName = userDto.FirstName,
+                        LastName = userDto.LastName,
+                        EmailAddress = userDto.EmailAddress,
+                        CreateDate = DateTime.UtcNow
+                    };
+
+                    IdentityResult result = await _userRepository.CreateNewUser(newUser, userDto.Password);
+                    if(result.Succeeded)
+                    {
+                        return Ok();
+                    }
+                }
+            }
+            return BadRequest();
         }
 
         [Authorize(Roles = "Admin")]
