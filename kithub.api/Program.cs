@@ -6,6 +6,7 @@ using kithub.api.Areas.Identity.Data;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Configuration;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+	app.UseCors(policy =>
+	policy.WithOrigins("https://localhost:7161")
+	.AllowAnyMethod()
+	.AllowAnyHeader()
+    .AllowCredentials()
+);
 }
 
 app.UseHttpsRedirection();
