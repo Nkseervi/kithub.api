@@ -1,5 +1,6 @@
 ﻿using kithub.api.Areas.Identity.Data;
 using kithub.api.Extensions;
+using kithub.api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +22,15 @@ namespace kithub.api.Controllers
             _userRepository = userRepository;
         }
 
-        public record UserRegistrationDto(
+		[HttpGet]
+		public async Task<UserDto> GetById()
+		{
+			string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+			KithubUser user = await _userRepository.GetUserById(userId);
+			return user.ConvertToDto();
+		}
+
+		public record UserRegistrationDto(
             string FirstName,
             string LastName,
             string EmailAddress,

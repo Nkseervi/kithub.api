@@ -98,5 +98,17 @@ namespace kithub.api.Extensions
                     }).ToList();
 
         }
-    }
+		public static UserDto ConvertToDto(this KithubUser user)
+		{
+			return new UserDto
+					{
+						Id = user.Id,
+						FirstName = user.FirstName,
+						LastName = user.LastName,
+						CreateDate = user.CreateDate,
+						EmailAddress = user.EmailAddress,
+					};
+
+		}
+	}
 }

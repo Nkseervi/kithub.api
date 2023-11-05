@@ -8,5 +8,6 @@ namespace kithub.api.Repositories.Contracts
         Task<IdentityResult> CreateNewUser(KithubUser newUser, string password);
         Task<KithubUser> FindExistingUser(string emailAddress);
         Task<IEnumerable<KithubUser>> GetAllUsers();
-    }
+		Task<KithubUser> GetUserById(string id);
+	}
 }

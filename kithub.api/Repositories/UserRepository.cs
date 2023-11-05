@@ -11,7 +11,14 @@ namespace kithub.api.Repositories
         {
             _userManager = userManager;
         }
-        public async Task<IEnumerable<KithubUser>> GetAllUsers()
+		public async Task<KithubUser> GetUserById(string id)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+
+			return user;
+
+		}
+		public async Task<IEnumerable<KithubUser>> GetAllUsers()
         {
             var users = await _userManager.Users.ToListAsync();
 
