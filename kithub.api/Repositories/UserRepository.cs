@@ -6,11 +6,13 @@ namespace kithub.api.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly UserManager<KithubUser> _userManager;
+		private readonly KithubDbContext _context;
 
-        public UserRepository(UserManager<KithubUser> userManager)
+		public UserRepository(UserManager<KithubUser> userManager, KithubDbContext context)
         {
             _userManager = userManager;
-        }
+			_context = context;
+		}
 		public async Task<KithubUser> GetUserById(string id)
 		{
 			var user = await _userManager.FindByIdAsync(id);
@@ -31,7 +33,21 @@ namespace kithub.api.Repositories
         }
         public async Task<IdentityResult> CreateNewUser(KithubUser newUser, string password)
         {
-            return await _userManager.CreateAsync(newUser, password);
+            var result = await _userManager.CreateAsync(newUser, password);
+
+            if(result.Succeeded)
+            {
+                var cart = createNewCart(new Cart { UserId = newUser.Id });
+            }
+
+            return result;
         }
-    }
+		private async Task<Cart> createNewCart(Cart newCart)
+		{
+			var result = await _context.Carts.AddAsync(newCart);
+            await _context.SaveChangesAsync();
+            return result.Entity;
+		}
+
+	}
 }

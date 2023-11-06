@@ -16,7 +16,7 @@
 
         [HttpGet]
         [Route("{userId}/GetItems")]
-        public async Task<ActionResult<IEnumerable<CartItemDto>>> GetItems(int userId)
+        public async Task<ActionResult<IEnumerable<CartItemDto>>> GetItems(string userId)
         {
             try
             {

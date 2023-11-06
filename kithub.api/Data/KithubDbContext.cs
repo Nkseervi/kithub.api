@@ -12,30 +12,30 @@
             base.OnModelCreating(modelBuilder);
 
             #region Users
-            modelBuilder.Entity<User>().HasData(new User
-            {
-                Id = 1,
-                UserName = "Nkseervi"
-            });
-            modelBuilder.Entity<User>().HasData(new User
-            {
-                Id = 2,
-                UserName = "TestUser"
-            });
+            //modelBuilder.Entity<User>().HasData(new User
+            //{
+            //    Id = 1,
+            //    UserName = "Nkseervi"
+            //});
+            //modelBuilder.Entity<User>().HasData(new User
+            //{
+            //    Id = 2,
+            //    UserName = "TestUser"
+            //});
 
-            //Create Shopping Cart for Users
-            modelBuilder.Entity<Cart>().HasData(new Cart
-            {
-                Id = 1,
-                UserId = 1
+            ////Create Shopping Cart for Users
+            //modelBuilder.Entity<Cart>().HasData(new Cart
+            //{
+            //    Id = 1,
+            //    UserId = 1
 
-            });
-            modelBuilder.Entity<Cart>().HasData(new Cart
-            {
-                Id = 2,
-                UserId = 2
+            //});
+            //modelBuilder.Entity<Cart>().HasData(new Cart
+            //{
+            //    Id = 2,
+            //    UserId = 2
 
-            });
+            //});
 
             #endregion
 

@@ -69,7 +69,7 @@
                           }).SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<CartItem>> GetItems(int userId)
+        public async Task<IEnumerable<CartItem>> GetItems(string userId)
         {
             return await (from cart in this.kesarjotShopDbContext.Carts
                           join cartItem in this.kesarjotShopDbContext.CartItems
