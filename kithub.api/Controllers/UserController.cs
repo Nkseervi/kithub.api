@@ -17,17 +17,19 @@ namespace kithub.api.Controllers
     {
         private readonly IUserRepository _userRepository;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository,
+                              IShoppingCartRepository shoppingCartRepository)
         {
             _userRepository = userRepository;
         }
 
 		[HttpGet]
-		public async Task<UserDto> GetById()
+		public async Task<LoggedInUserDto> GetById()
 		{
 			string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
 			KithubUser user = await _userRepository.GetUserById(userId);
-			return user.ConvertToDto();
+            Cart cart = await _userRepository.getCart(new Cart() { UserId = userId });
+			return user.ConvertToDto(cart);
 		}
 
 		public record UserRegistrationDto(

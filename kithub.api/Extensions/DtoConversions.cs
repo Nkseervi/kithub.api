@@ -98,11 +98,12 @@ namespace kithub.api.Extensions
                     }).ToList();
 
         }
-		public static UserDto ConvertToDto(this KithubUser user)
+		public static LoggedInUserDto ConvertToDto(this KithubUser user, Cart cart)
 		{
-			return new UserDto
+			return new LoggedInUserDto
 					{
 						Id = user.Id,
+                        CartId = cart.Id,
 						FirstName = user.FirstName,
 						LastName = user.LastName,
 						CreateDate = user.CreateDate,

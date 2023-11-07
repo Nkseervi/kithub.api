@@ -37,16 +37,25 @@ namespace kithub.api.Repositories
 
             if(result.Succeeded)
             {
-                var cart = createNewCart(new Cart { UserId = newUser.Id });
+                await getCart(new Cart { UserId = newUser.Id });
             }
 
             return result;
         }
-		private async Task<Cart> createNewCart(Cart newCart)
+		public async Task<Cart> getCart(Cart newCart)
 		{
-			var result = await _context.Carts.AddAsync(newCart);
-            await _context.SaveChangesAsync();
-            return result.Entity;
+            if (await _context.Carts.AnyAsync(c => c.UserId == newCart.UserId))
+            {
+                return await _context.Carts
+                                        .Where(c => c.UserId == newCart.UserId)
+                                        .FirstAsync();
+            }
+            else
+            {
+                var result = await _context.Carts.AddAsync(newCart);
+                await _context.SaveChangesAsync();
+                return result.Entity;
+            }
 		}
 
 	}
