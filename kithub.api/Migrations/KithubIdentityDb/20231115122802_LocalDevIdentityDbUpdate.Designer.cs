@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using kithub.api.Areas.Identity.Data;
 
@@ -11,9 +12,11 @@ using kithub.api.Areas.Identity.Data;
 namespace kithub.api.Migrations.KithubIdentityDb
 {
     [DbContext(typeof(KithubIdentityDbContext))]
-    partial class KithubIdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231115122802_LocalDevIdentityDbUpdate")]
+    partial class LocalDevIdentityDbUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

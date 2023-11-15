@@ -17,12 +17,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+#if DEBUG
+builder.Services.AddDbContextPool<KithubDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("KithubAPIContextDev") ?? throw new InvalidOperationException("Connection string 'KesarjotAPIContext' not found.")));
+
+builder.Services.AddDbContextPool<KithubIdentityDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("KithubAPIContextDev") ?? throw new InvalidOperationException("Connection string 'KesarjotAPIContext' not found.")));
+
+#else
 builder.Services.AddDbContextPool<KithubDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("KithubAPIContext") ?? throw new InvalidOperationException("Connection string 'KesarjotAPIContext' not found.")));
 
 builder.Services.AddDbContextPool<KithubIdentityDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("KithubAPIContext") ?? throw new InvalidOperationException("Connection string 'KesarjotAPIContext' not found.")));
 
+#endif
 builder.Services.AddDefaultIdentity<KithubUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<KithubIdentityDbContext>();
