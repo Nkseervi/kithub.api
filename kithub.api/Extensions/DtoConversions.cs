@@ -111,5 +111,18 @@ namespace kithub.api.Extensions
 					};
 
 		}
+
+        public static IEnumerable<OrderDto> ConvertToDto(this IEnumerable<Order> orders)
+        {
+            return (from order in orders
+                    select new OrderDto
+                    {
+                        Id = order.Id,
+                        Amount = order.Amount,
+                        CreatedOn = order.CreatedOn,
+                        Status = order.Status,
+                        UpdatedOn = order.UpdatedOn
+                    }).ToList();
+        }
 	}
 }
