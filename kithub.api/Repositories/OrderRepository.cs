@@ -245,6 +245,12 @@ namespace kithub.api.Repositories
 
         }
 
-        
+        public bool VerifyCheckSum(string xverify, string payload)
+        {
+            string result = genarateXVerify(payload + _config.GetValue<string>("PhonePe:SaltKey"));
+            if(result == xverify)
+                return true;
+            else return false;
+        }
     }
 }

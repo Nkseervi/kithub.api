@@ -1,4 +1,5 @@
-﻿using kithub.api.models.Dtos;
+﻿using kithub.api.Entities;
+using kithub.api.models.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -71,23 +72,26 @@ namespace kithub.api.Controllers
         {
             try
             {
-                var decodedCallbackResponse = _orderRepository.DecodeBase64Response(callbackResponse.response);
-
-                if (decodedCallbackResponse is null)
+                if (_orderRepository.VerifyCheckSum(xverify, callbackResponse.response))
                 {
-                    return NoContent();
-                }
+                    var decodedCallbackResponse = _orderRepository.DecodeBase64Response(callbackResponse.response);
 
-                var order = await _orderRepository
-                                .GetOrderDetail(decodedCallbackResponse.data.merchantTransactionId);
-                if (order is null || order.Checksum != xverify)
+                    if (decodedCallbackResponse is null)
+                    {
+                        return NoContent();
+                    }
+
+                    var order = await _orderRepository
+                                    .GetOrderDetail(decodedCallbackResponse.data.merchantTransactionId);
+                    
+                    var updatedStatus = await _orderRepository.UpdateOrderStatus(order, decodedCallbackResponse.code, string.Empty);
+
+                    return Ok(updatedStatus);
+                }
+                else 
                 {
                     return BadRequest();
                 }
-
-                var updatedStatus = await _orderRepository.UpdateOrderStatus(order, decodedCallbackResponse.code, string.Empty);
-
-                return Ok(updatedStatus);
             }
             catch(Exception ex)
             {
