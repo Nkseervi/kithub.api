@@ -2,10 +2,12 @@
 using kithub.api.models.PhonePe;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Buffers.Text;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using static System.Net.WebRequestMethods;
 
 namespace kithub.api.Repositories
 {
@@ -24,10 +26,10 @@ namespace kithub.api.Repositories
             _client = client;
         }
 
-        public async Task<Order> GetOrderDetail(Guid orderId)
+        public async Task<Order> GetOrderDetail(string orderId)
         {
             var order = await _kithubDbContext.Orders
-                                        .FirstOrDefaultAsync(o => o.Id == orderId);
+                                        .FirstOrDefaultAsync(o => o.Id.ToString() == orderId);
             return order;
         }
 
@@ -41,13 +43,11 @@ namespace kithub.api.Repositories
             return orders;
         }
 
-        public async Task<Order> CreateOrder(string userId, OrderDto orderDto)
+        private async Task<Order> CreateOrder(string userId, int payAmount)
         {
-            string xverify = string.Empty;
             Order order = new()
             {
-                Amount = orderDto.Amount,
-                Checksum = xverify,
+                AmountPaise = payAmount,
                 UserId = userId
             };
             var result = await _kithubDbContext.Orders.AddAsync(order);
@@ -55,19 +55,55 @@ namespace kithub.api.Repositories
             return result.Entity;
         }
 
-        public async Task<string> CheckPaymentStatus(Order order)
+        public async Task<string> CheckPaymentStatus(int orderId)
         {
-            var item = await _kithubDbContext.Orders.FirstOrDefaultAsync(o => o.Id == order.Id);
+            var item = await _kithubDbContext.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
             if (item is not null)
             {
-                item.Status = order.Status;
+                try
+                {
+                    // ON LIVE URL YOU MAY GET CORS ISSUE, ADD Below LINE TO RESOLVE
+                    //ServicePointManager.Expect100Continue = true;
+                    //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                    string api = _config.GetValue<string>("PhonePe:PayApiGatewayUrl") + "/" +
+                                                _config.GetValue<string>("PhonePe:CheckStatusApiEndPoint") +
+                                                _config.GetValue<string>("PhonePe:MerchantId") + "/" +
+                                                orderId.ToString();
+                    var uri = new Uri(api);
+                    string reqString = string.Concat(_config.GetValue<string>("PhonePe:CheckStatusApiEndPoint"),
+                                            _config.GetValue<string>("MerchantId"), "/", orderId.ToString(),
+                                            _config.GetValue<string>("PhonePe:SaltKey"));
+                    string xverify = genarateXVerify(reqString);
+                    // Add headers
+                    _client.DefaultRequestHeaders.Add("accept", "application/json");
+                    _client.DefaultRequestHeaders.Add("X-VERIFY", xverify);
+                    _client.DefaultRequestHeaders.Add("X-MERCHANT-ID", _config.GetValue<string>("MerchantId"));
+
+                    // Send POST request
+                    var response = await _client.GetAsync(uri);
+                    response.EnsureSuccessStatusCode();
+
+                    // Read and deserialize the response content
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    //return api;
+                    // Return a response
+                    //return Json(new { Success = true, Message = "Verification successful", phonepeResponse = responseContent });
+                }
+                catch (Exception ex)
+                {
+                    // Handle errors and return an error response
+                    //return Json(new { Success = false, Message = "Verification failed", Error = ex.Message });
+                }
+
                 item.UpdatedOn = DateTime.UtcNow;
                 await _kithubDbContext.SaveChangesAsync();
             }
-            return order.Status;
+            return item.Status;
         }
 
-        public async Task<Uri> GeneratePaymentLink(OrderDto orderDto)
+        public async Task<Uri> GeneratePaymentLink(string userId, int amount)
         {
             try
             {
@@ -75,15 +111,24 @@ namespace kithub.api.Repositories
                 //ServicePointManager.Expect100Continue = true;
                 //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-                string base64 = generateBase64Payload(orderDto);
-                string xverify = genarateXVerify(base64);
+                var order = await CreateOrder(userId, amount);
+
+                string base64 = generateBase64Payload(order);
+                string reqString = string.Concat(base64,
+                                                    _config.GetValue<string>("PhonePe:PayApiEndPoint"),
+                                                    _config.GetValue<string>("PhonePe:SaltKey"));
+                string xverify = genarateXVerify(reqString);
 
                 var response = await SendRequest(base64, xverify);
 
                 if (response is not null)
                 {
                     if (response.success)
+                    {
+                        await UpdateOrderStatus(order, "PAYMENT_INITIATED", xverify);
                         return new Uri(response.data.instrumentResponse.redirectInfo.url);
+
+                    }
                 }
                 return null;
             }
@@ -94,11 +139,16 @@ namespace kithub.api.Repositories
             }
         }
 
-        public async Task<string> UpdateOrderStatus(Order order, string status)
+        public async Task<string> UpdateOrderStatus(Order order, string status, string checksum)
         {
             try
             {
                 order.Status = status;
+                order.UpdatedOn = DateTime.UtcNow;
+                if(string.IsNullOrWhiteSpace(order.Checksum))
+                {
+                    order.Checksum = checksum;
+                }                
                 await _kithubDbContext.SaveChangesAsync();
                 return status;
             }
@@ -121,18 +171,22 @@ namespace kithub.api.Repositories
                 return null;
             }
         }
-        private string generateBase64Payload(OrderDto orderDto)
+        private string generateBase64Payload(Order order)
         {
             Payload payload = new Payload()
             {
-                amount = orderDto.Amount,
+                amount = order.AmountPaise,
                 callbackUrl = _config.GetValue<string>("PhonePe:CallbackUrl"),
+                //callbackUrl = "https://webhook.site/732c1622-8f76-40ae-b1c1-988d2e15600b",
                 merchantId = _config.GetValue<string>("PhonePe:MerchantId"),
-                merchantTransactionId = orderDto.Id.ToString(),
+                merchantTransactionId = order.Id.ToString(),
+                //merchantTransactionId = "MT7850590068188104",
+                //merchantUserId = order.UserId,
                 merchantUserId = "MUID123",
                 mobileNumber = "9999999999",
                 redirectMode = "REDIRECT",
-                redirectUrl = _config.GetValue<string>("PhonePe:RedirectUrl"),
+                redirectUrl = string.Concat(_config.GetValue<string>("PhonePe:RedirectUrl"),
+                                        order.Id),
                 paymentInstrument = new PayloadPaymentInstrument
                 {
                     type = "PAY_PAGE"
@@ -145,14 +199,10 @@ namespace kithub.api.Repositories
             return base64;
         }
 
-        private string genarateXVerify(string base64)
-        {
-
-            string newbase64 = string.Concat(base64, 
-                                                _config.GetValue<string>("PhonePe:PayApiEndPoint"),
-                                                _config.GetValue<string>("PhonePe:SaltKey"));
+        private string genarateXVerify(string reqString)
+        {                
             SHA256 sha256Hash = SHA256.Create();
-            var xfiles = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(newbase64));
+            var xfiles = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(reqString));
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < xfiles.Length; i++)
             {

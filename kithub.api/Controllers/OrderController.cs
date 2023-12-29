@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using kithub.api.models.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol;
@@ -18,19 +19,21 @@ namespace kithub.api.Controllers
             _orderRepository = orderRepository;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<string>> CreateOrder(OrderDto orderDto)
+        [HttpGet]
+        [Route("{orderId:int}")]
+        public async Task<ActionResult<OrderDto>> GetOrderDetails(int orderId)
         {
             try
             {
-                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var newOrder = await _orderRepository.CreateOrder(userId, orderDto);
-                if (newOrder is null)
+                var order = await _orderRepository.GetOrderDetail(orderId.ToString());
+                if (order is null)
                 {
                     return NoContent();
                 }
 
-                return Ok(newOrder.Id.ToString());
+                var orderDto = order.ConvertToDto();
+
+                return Ok(orderDto);
             }
             catch (Exception ex)
             {
@@ -39,7 +42,6 @@ namespace kithub.api.Controllers
         }
 
         [HttpGet]
-        [Route("/GetItems")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllOrders()
         {
             try
@@ -62,14 +64,14 @@ namespace kithub.api.Controllers
         }
 
         [HttpPost]
-        [Route("/PhonePeCallback")]
+        [Route("PhonePeCallback")]
         [AllowAnonymous]
         public async Task<ActionResult<string>> PhonePeCallback([FromHeader(Name = "X-Verify")] string xverify,
-                                                                [FromForm(Name = "response")] string callbackResponse)
+                                                                [FromBody] PhonePayCallback callbackResponse)
         {
             try
             {
-                var decodedCallbackResponse = _orderRepository.DecodeBase64Response(callbackResponse);
+                var decodedCallbackResponse = _orderRepository.DecodeBase64Response(callbackResponse.response);
 
                 if (decodedCallbackResponse is null)
                 {
@@ -77,13 +79,13 @@ namespace kithub.api.Controllers
                 }
 
                 var order = await _orderRepository
-                                .GetOrderDetail(new Guid(decodedCallbackResponse.data.merchantTransactionId));
+                                .GetOrderDetail(decodedCallbackResponse.data.merchantTransactionId);
                 if (order is null || order.Checksum != xverify)
                 {
                     return BadRequest();
                 }
 
-                var updatedStatus = await _orderRepository.UpdateOrderStatus(order, decodedCallbackResponse.code);
+                var updatedStatus = await _orderRepository.UpdateOrderStatus(order, decodedCallbackResponse.code, string.Empty);
 
                 return Ok(updatedStatus);
             }
@@ -93,19 +95,40 @@ namespace kithub.api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("/GeneratePaymentLink")]
+        [HttpPost]
+        [Route("GeneratePaymentLink")]
         public async Task<ActionResult<Uri>> GeneratePaymentLink(OrderDto orderDto)
         {
             try
             {
-                var url = await _orderRepository.GeneratePaymentLink(orderDto);
+                string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                var url = await _orderRepository.GeneratePaymentLink(userId, orderDto.Amount);
                 return Ok(url);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
+        }
+
+        [HttpPost]
+        [Route("CheckPaymentStatus/{orderId:int}")]
+        public async Task<IActionResult> CheckPaymentStatus(int orderId)
+        {
+            try
+            {
+                var url = await _orderRepository.CheckPaymentStatus(orderId);
+                return Ok(url);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        public record PhonePayCallback
+        {
+            public string response { get; set; }
         }
 
     }

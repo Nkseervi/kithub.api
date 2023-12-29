@@ -36,6 +36,10 @@ builder.Services.AddDefaultIdentity<KithubUser>(options => options.SignIn.Requir
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<KithubIdentityDbContext>();
 
+
+builder.Services.AddScoped(sp => new HttpClient());
+
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -68,7 +72,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 	app.UseCors(policy =>
-	policy.WithOrigins("https://localhost:7161")
+    policy.SetIsOriginAllowed( origin => true)
+	//policy.WithOrigins("https://localhost:7161")
 	.AllowAnyMethod()
 	.AllowAnyHeader()
     .AllowCredentials()

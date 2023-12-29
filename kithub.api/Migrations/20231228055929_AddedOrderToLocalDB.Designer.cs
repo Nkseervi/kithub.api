@@ -12,8 +12,8 @@ using kithub.api.Data;
 namespace kithub.api.Migrations
 {
     [DbContext(typeof(KithubDbContext))]
-    [Migration("20231226145105_AddedOrderTablesToLocalDB")]
-    partial class AddedOrderTablesToLocalDB
+    [Migration("20231228055929_AddedOrderToLocalDB")]
+    partial class AddedOrderToLocalDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,11 +66,13 @@ namespace kithub.api.Migrations
 
             modelBuilder.Entity("kithub.api.Entities.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<int>("Amount")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AmountPaise")
                         .HasColumnType("int");
 
                     b.Property<string>("Checksum")
@@ -110,8 +112,8 @@ namespace kithub.api.Migrations
                     b.Property<int>("ListedPrice")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ProductName")
                         .IsRequired()

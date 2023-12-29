@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using kithub.api.Data;
 
@@ -11,9 +12,11 @@ using kithub.api.Data;
 namespace kithub.api.Migrations
 {
     [DbContext(typeof(KithubDbContext))]
-    partial class KithubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231229090359_AddOrderToProdDB")]
+    partial class AddOrderToProdDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

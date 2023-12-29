@@ -118,11 +118,35 @@ namespace kithub.api.Extensions
                     select new OrderDto
                     {
                         Id = order.Id,
-                        Amount = order.Amount,
+                        Amount = order.AmountPaise,
                         CreatedOn = order.CreatedOn,
                         Status = order.Status,
                         UpdatedOn = order.UpdatedOn
                     }).ToList();
         }
-	}
+
+        public static OrderDto ConvertToDto(this Order order)
+        {
+            List<OrderItemDto> orderItemDtos =
+                (from orderItem in order.OrderItems
+                    select new OrderItemDto
+                    {
+                        ProductName = orderItem.ProductName,
+                        Discount = orderItem.Discount,
+                        ListedPrice = orderItem.ListedPrice,
+                        Qty = orderItem.Qty,
+                        SellingPrice = orderItem.SellingPrice
+                    }).ToList();
+
+            return new OrderDto
+            {
+                Id = order.Id,
+                Amount = order.AmountPaise,
+                CreatedOn = order.CreatedOn,
+                Status = order.Status,
+                UpdatedOn = order.UpdatedOn,
+                OrderItems = orderItemDtos
+            };
+        }
+    }
 }
