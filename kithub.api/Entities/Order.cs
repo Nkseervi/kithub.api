@@ -3,11 +3,11 @@
     public class Order
     {
         public int Id { get; set; }
-        public string UserId { get; set; } = string.Empty;
-        public int AmountPaise { get; set; }
+        public string UserId { get; set; }
+        public decimal Amount { get; set; }
         public string Status { get; set; } = "ORDER_CREATED";
         public List<OrderItem> OrderItems { get; set; } = new();
-        public string Checksum {  get; set; } =string.Empty;
+        public Payment Payment { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedOn { get; set; }
     }

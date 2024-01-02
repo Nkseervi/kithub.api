@@ -17,6 +17,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+
 #if DEBUG
 builder.Services.AddDbContextPool<KithubDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("KithubAPIContextDev") ?? throw new InvalidOperationException("Connection string 'KesarjotAPIContext' not found.")));
@@ -40,10 +46,6 @@ builder.Services.AddDefaultIdentity<KithubUser>(options => options.SignIn.Requir
 builder.Services.AddScoped(sp => new HttpClient());
 
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IShoppingCartRepository, ShoppingCartRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 builder.Services.AddAuthentication(options =>
 {

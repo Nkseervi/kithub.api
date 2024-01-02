@@ -118,7 +118,7 @@ namespace kithub.api.Extensions
                     select new OrderDto
                     {
                         Id = order.Id,
-                        Amount = order.AmountPaise,
+                        Amount = order.Amount,
                         CreatedOn = order.CreatedOn,
                         Status = order.Status,
                         UpdatedOn = order.UpdatedOn
@@ -132,16 +132,19 @@ namespace kithub.api.Extensions
                     select new OrderItemDto
                     {
                         ProductName = orderItem.ProductName,
-                        Discount = orderItem.Discount,
+                        DiscountPercent = orderItem.Discount,
                         ListedPrice = orderItem.ListedPrice,
                         Qty = orderItem.Qty,
-                        SellingPrice = orderItem.SellingPrice
+                        SellingPrice = orderItem.SellingPrice,
+                        GstRate = orderItem.GstRate,
+                        ProductDescription = orderItem.ProductDescription,
+                        TotalPrice = orderItem.TotalPrice
                     }).ToList();
 
             return new OrderDto
             {
                 Id = order.Id,
-                Amount = order.AmountPaise,
+                Amount = order.Amount,
                 CreatedOn = order.CreatedOn,
                 Status = order.Status,
                 UpdatedOn = order.UpdatedOn,

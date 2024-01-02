@@ -4,12 +4,9 @@ namespace kithub.api.Repositories.Contracts
 {
     public interface IOrderRepository
     {
-        Task<string> CheckPaymentStatus(int orderId);
-        CallbackResponse DecodeBase64Response(string callbackResponse);
-        Task<Uri> GeneratePaymentLink(string userId, int amount);
+        Task<Order> CreateOrder(string userId, OrderDto orderDto);
         Task<IEnumerable<Order>> GetAllOrders(string userId);
         Task<Order> GetOrderDetail(string orderId);
-        Task<string> UpdateOrderStatus(Order order, string status, string checksum);
-        bool VerifyCheckSum(string xverify, string payload);
+        Task UpdateOrderStatus(Order order);
     }
 }
