@@ -121,7 +121,16 @@ namespace kithub.api.Extensions
                         Amount = order.Amount,
                         CreatedOn = order.CreatedOn,
                         Status = order.Status,
-                        UpdatedOn = order.UpdatedOn
+                        UpdatedOn = order.UpdatedOn,
+                        OrderItems = (from ordItem in order.OrderItems
+                                      select new OrderItemDto
+                                      {
+                                          ProductName = ordItem.ProductName,
+                                          ProductDescription = ordItem.ProductDescription,
+                                          Qty = ordItem.Qty,
+                                          SellingPrice = ordItem.SellingPrice,
+                                          TotalPrice = ordItem.TotalPrice
+                                      }).ToList()
                     }).ToList();
         }
 
