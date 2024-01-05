@@ -29,8 +29,9 @@ namespace kithub.api.Controllers
         {
             try
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var order = await _orderRepository.GetOrderDetail(orderId.ToString());
-                if (order is null)
+                if (order is null || userId != order.UserId)
                 {
                     return NoContent();
                 }
